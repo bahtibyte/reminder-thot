@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from discord.ext import commands
+from discord import Embed
 from quart import Quart
 from datetime import datetime
 from hypercorn.asyncio import serve
@@ -17,14 +18,23 @@ app = Quart(__name__)
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
-@bot.command(name="hi")
-async def hi_command(ctx):
-    await ctx.channel.send("hello")
+async def refresh():
+    for doc in alerts.find():
+        if 'title' not in doc:
+            continue
+        
+        if datetime.now() > datetime.strptime(doc['date'] + ' 9', '%m-%d-%Y %H'):
+            embed = Embed(title=doc['title'] + ' Reminder', description=doc['body'], color=0xff0000)
+            channel = await bot.fetch_channel(969683673639157790)
+            await channel.send(embed=embed)
+
+            alerts.find_one_and_delete({"_id": doc['_id']})
+
+        print('Completed refresh')
 
 @bot.event
 async def on_message(message):
     if message.content.startswith('-alert'):
-
         msg = message.content.split('|')
         
         data = {
@@ -35,16 +45,17 @@ async def on_message(message):
         
         alerts.insert_one(data)
 
-        await message.channel.send('d')
+        await message.channel.send('Alert created for ' + data['date'])
 
 @app.route("/")
 async def hello():
-    alerts.insert_one({'info': 'user visited', 'time': datetime.now()})
-    return "hello world by bahti"
+    mongo['reminder-thot']['visits'].insert_one({'visit-time': datetime.now()})
+    await refresh()
+    return 'Welcome to reminder-thot'
 
 hypercorn_config = Config()
-hypercorn_config.bind = ["0.0.0.0:" + os.getenv('PORT')]
+hypercorn_config.bind = ['0.0.0.0:' + os.getenv('PORT')]
 
-print(f"\n\nRunning on: {hypercorn_config.bind}\n\n")
+print(f'\n\nRunning on: {hypercorn_config.bind}\n\n')
 bot.loop.create_task(serve(app, hypercorn_config))
 bot.run(os.getenv('DISCORD_TOKEN'))
