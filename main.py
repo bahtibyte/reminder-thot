@@ -9,6 +9,7 @@ import os
 
 mongo = MongoClient(os.getenv('MONGO_HOST'))
 alerts = mongo['reminder-thot']['alerts']
+archives = mongo['reminder-thot']['archives']
 
 bot = commands.Bot(command_prefix='-')
 
@@ -44,6 +45,7 @@ async def on_message(message):
         }
         
         alerts.insert_one(data)
+        archives.insert_one(data)
 
         await message.channel.send('Alert created for ' + data['date'])
 
