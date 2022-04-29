@@ -2,3 +2,4 @@ Hypercorn==0.11.2
 logger==1.4
 Quart==0.15.1
 requests==2.25.1
+Jinja2==3.0.1
