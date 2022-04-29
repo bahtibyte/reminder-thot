@@ -1,30 +1,9 @@
-from quart import Quart
-import asyncio
-import logging
-import os
-import asyncio
-from hypercorn.asyncio import serve
-from hypercorn.config import Config
-
-my_loop = asyncio.get_event_loop()
-app = Quart(__name__)
-
-log = logging.getLogger(__name__)
-
-@app.route("/")
+from flask import Flask
+ 
+app = Flask(__name__)
+ 
+@app.route('/')
 def index():
-    return "Hello World! From BootcampV2"
+  return '<h1>I want to Deploy Flask to Heroku</h1>'
 
-# loop.create_task(discord.connect())
-
-if os.getenv('ENV') == 'PROD':
-    port = os.getenv('PORT')
-    hypercorn_config = Config()
-    hypercorn_config.bind = ["0.0.0.0:" + port]
-
-    log.info(f"\n\nRunning on: {hypercorn_config.bind}\n\n")
-    my_loop.run_until_complete(serve(app, hypercorn_config))
-else:
-    my_loop.run_until_complete(serve(app, Config()))
-
-
+app.run()
