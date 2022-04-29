@@ -2,6 +2,8 @@ from pymongo import MongoClient
 from discord.ext import commands
 from quart import Quart
 from datetime import datetime
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
 import os
 
 mongo = MongoClient(os.getenv('MONGO_HOST'))
@@ -40,5 +42,9 @@ async def hello():
     alerts.insert_one({'info': 'user visited', 'time': datetime.now()})
     return "hello world by bahti"
 
-bot.loop.create_task(app.run_task())
+hypercorn_config = Config()
+hypercorn_config.bind = ["0.0.0.0:" + os.getenv('PORT')]
+
+print(f"\n\nRunning on: {hypercorn_config.bind}\n\n")
+bot.loop.create_task(serve(app, hypercorn_config))
 bot.run(os.getenv('DISCORD_TOKEN'))
