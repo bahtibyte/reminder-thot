@@ -6,7 +6,7 @@ import asyncio
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
 
-loop = asyncio.get_event_loop()
+my_loop = asyncio.get_event_loop()
 app = Quart(__name__)
 
 log = logging.getLogger(__name__)
@@ -23,9 +23,8 @@ if os.getenv('ENV') == 'PROD':
     hypercorn_config.bind = ["0.0.0.0:" + port]
 
     log.info(f"\n\nRunning on: {hypercorn_config.bind}\n\n")
-    loop.run_until_complete(serve(app, hypercorn_config))
+    my_loop.run_until_complete(serve(app, hypercorn_config))
 else:
-    loop.run_until_complete(serve(app, Config()))
-
+    my_loop.run_until_complete(serve(app, Config()))
 
 
