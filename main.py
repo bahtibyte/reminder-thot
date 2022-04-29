@@ -48,6 +48,7 @@ async def on_message(message):
         archives.insert_one(data)
 
         await message.channel.send('Alert created for ' + data['date'])
+        await message.delete()
 
 @app.route("/")
 async def hello():
