@@ -2,3 +2,4 @@ discord.py
 pymongo==3.12.0
 Quart==0.15.1
 Jinja2==3.0.1
+dnspython==1.16.0
